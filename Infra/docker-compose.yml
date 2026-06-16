@@ -1,0 +1,105 @@
+version: '3.8'
+
+# ─────────────────────────────────────────────────────────────────
+#  Relatos de Papel — Infraestructura local completa
+#  Uso: docker-compose up -d
+#  Panel RabbitMQ: http://localhost:15672  (guest / guest)
+# ─────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Bases de datos ──────────────────────────────────────────────
+
+  postgres-catalogue:
+    image: postgres:15
+    container_name: catalogue-db
+    restart: always
+    environment:
+      POSTGRES_DB:       catalogue_db
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - catalogue_data:/var/lib/postgresql/data
+    networks:
+      - relatos-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-orders:
+    image: postgres:15
+    container_name: orders-db
+    restart: always
+    environment:
+      POSTGRES_DB:       orders_db
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - orders_data:/var/lib/postgresql/data
+    networks:
+      - relatos-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Mensajería ───────────────────────────────────────────────────
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: relatos-rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    ports:
+      - "5672:5672"    # AMQP — microservicios Java
+      - "15672:15672"  # Management UI — http://localhost:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - relatos-net
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  # ── Caché / Sesiones ─────────────────────────────────────────────
+
+  redis:
+    image: redis:7-alpine
+    container_name: relatos-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - relatos-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# ── Volúmenes ────────────────────────────────────────────────────
+
+volumes:
+  catalogue_data:
+  orders_data:
+  rabbitmq_data:
+  redis_data:
+
+# ── Red interna ─────────────────────────────────────────────────
+
+networks:
+  relatos-net:
+    driver: bridge
