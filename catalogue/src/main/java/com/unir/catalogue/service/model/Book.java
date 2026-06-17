@@ -1,11 +1,13 @@
 package com.unir.catalogue.service.model;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @Table(name="book")

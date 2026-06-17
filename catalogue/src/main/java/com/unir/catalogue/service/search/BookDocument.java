@@ -8,27 +8,18 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@Document(indexName = "books")
+@Document(indexName = "books" , createIndex = false)
 public class BookDocument {
 
     @Id
     private Long id;
-
     private String title;
-
     private String author;
-
     private LocalDate publicationDate;
-
     private String category;
-
     private String isbn;
-
     private Integer rating;
-
     private Boolean visible;
-
     private Integer stock;
-
     private BigDecimal price;
 }
