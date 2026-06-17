@@ -5,6 +5,7 @@ import com.unir.catalogue.service.model.Book;
 import com.unir.catalogue.service.service.CatalogueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import com.unir.catalogue.service.search.BookDocument;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,12 +18,10 @@ public class CatalogueController {
     private final CatalogueService catalogueService;
 
     @GetMapping
-    public List<Book> getAll() {
-        return catalogueService.getAll();
-    }
+    public List<BookDocument> getAll()
 
     @GetMapping("/{id}")
-    public Book getById(@PathVariable Long id) {
+    public BookDocument getById(@PathVariable Long id) {
         return catalogueService.getById(id);
     }
 
@@ -47,7 +46,7 @@ public class CatalogueController {
     }
 
     @GetMapping("/search")
-    public List<Book> search(
+    public List<BookDocument> search(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String category,
@@ -57,5 +56,11 @@ public class CatalogueController {
             @RequestParam(required = false) LocalDate publicationDate
     ) {
         return catalogueService.search(title, author, category, isbn, rating, visible, publicationDate);
+    }
+
+    @PostMapping("/reindex")
+    public String reindex() {
+        catalogueService.reindex();
+        return "Indexación completada";
     }
 }

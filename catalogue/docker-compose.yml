@@ -14,5 +14,14 @@ services:
     volumes:
       - catalogue_data:/var/lib/postgresql/data
 
+  elasticsearch:
+    image: elasticsearch:8.15.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+
 volumes:
   catalogue_data:

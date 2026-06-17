@@ -11,6 +11,9 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
 
+  elasticsearch:
+    uris: http://localhost:9200
+
   jpa:
     hibernate:
       ddl-auto: none
