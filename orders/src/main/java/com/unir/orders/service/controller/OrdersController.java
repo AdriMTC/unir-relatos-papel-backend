@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
+// interruptor que transforma una clase común de Java en una API web pública.
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor

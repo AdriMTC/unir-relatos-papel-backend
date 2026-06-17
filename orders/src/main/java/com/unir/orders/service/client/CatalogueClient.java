@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 public class CatalogueClient {
 
     private final RestTemplate restTemplate;
+    // no usa una ip
     private static final String CATALOGUE_BOOK_URL = "http://catalogue-service/api/v1/books/{id}";
 
     public CatalogueBookResponse getBookById(Long bookId) {

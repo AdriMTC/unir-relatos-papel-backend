@@ -4,9 +4,11 @@ import com.unir.orders.service.client.CatalogueClient;
 import com.unir.orders.service.dto.CatalogueBookResponse;
 import com.unir.orders.service.dto.CreateOrderRequest;
 import com.unir.orders.service.dto.OrderResponse;
+import com.unir.orders.service.event.OrderCreatedEvent;
 import com.unir.orders.service.exception.InvalidOrderException;
 import com.unir.orders.service.exception.ResourceNotFoundException;
 import com.unir.orders.service.model.Order;
+import com.unir.orders.service.publisher.OrderEventPublisher;
 import com.unir.orders.service.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ public class OrdersService {
 
     private final OrderRepository orderRepository;
     private final CatalogueClient catalogueClient;
+    private final OrderEventPublisher orderEventPublisher;
 
     public OrderResponse create(CreateOrderRequest request) {
         CatalogueBookResponse book = catalogueClient.getBookById(request.getBookId());
@@ -31,7 +34,20 @@ public class OrdersService {
         order.setQuantity(request.getQuantity());
         order.setStatus("CREATED");
 
-        return OrderResponse.fromEntity(orderRepository.save(order));
+        Order savedOrder = orderRepository.save(order);
+
+        OrderCreatedEvent event = OrderCreatedEvent.builder()
+                .orderId(savedOrder.getId())
+                .userId(savedOrder.getUserId())
+                .customerEmail(request.getCustomerEmail())
+                .customerName(request.getCustomerName())
+                .bookTitle(savedOrder.getBookTitle())
+                .quantity(savedOrder.getQuantity())
+                .createdAt(savedOrder.getCreatedAt())
+                .build();
+        orderEventPublisher.publishOrderCreated(event);
+
+        return OrderResponse.fromEntity(savedOrder);
     }
 
     public List<OrderResponse> getRecentOrdersByUser(String userId) {
@@ -42,6 +58,7 @@ public class OrdersService {
     }
 
     private void validateBook(CatalogueBookResponse book) {
+        //
         if (book == null || book.getId() == null) {
             throw new ResourceNotFoundException("Libro no encontrado en catalogue");
         }
