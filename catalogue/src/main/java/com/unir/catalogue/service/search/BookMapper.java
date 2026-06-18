@@ -8,6 +8,9 @@ public class BookMapper {
 
     public BookDocument toDocument(Book book) {
 
+        System.out.println(
+                "Libro: " + book.getTitle() + " fecha=" + book.getPublicationDate());
+
         BookDocument doc = new BookDocument();
 
         doc.setId(book.getId());

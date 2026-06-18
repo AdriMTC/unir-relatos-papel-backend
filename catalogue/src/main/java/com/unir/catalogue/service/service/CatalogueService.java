@@ -9,6 +9,11 @@ import com.unir.catalogue.service.search.BookMapper;
 import com.unir.catalogue.service.search.BookSearchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHits;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +26,7 @@ public class CatalogueService {
     private final CatalogueRepository catalogueRepository;
     private final BookSearchRepository searchRepository;
     private final BookMapper mapper;
+    private final ElasticsearchOperations elasticsearchOperations;
 
     //CONSULTAS->ELASTICSEARCH
 
@@ -46,24 +52,61 @@ public class CatalogueService {
             LocalDate publicationDate
     ) {
 
-        if (title != null) {
-            return searchRepository.findByTitleContaining(title);
+        List<Query> queries = new ArrayList<>();
+
+        if (title != null && !title.isBlank()) {
+            queries.add(Query.of(q -> q.match(
+                    m -> m.field("title").query(title))));
         }
 
-        if (author != null) {
-            return searchRepository.findByAuthorContaining(author);
+        if (author != null && !author.isBlank()) {
+            queries.add(Query.of(q -> q.match(
+                    m -> m.field("author").query(author))));
         }
 
-        if (category != null) {
-            return searchRepository.findByCategory(category);
+        if (category != null && !category.isBlank()) {
+            queries.add(Query.of(q -> q.match(
+                    m -> m.field("category").query(category))));
         }
 
-        if (isbn != null) {
-            return searchRepository.findByIsbn(isbn);
+        if (isbn != null && !isbn.isBlank()) {
+            queries.add(Query.of(q -> q.match(
+                    m -> m.field("isbn").query(isbn))));
         }
 
-        return StreamSupport
-                .stream(searchRepository.findAll().spliterator(), false)
+        if (rating != null) {
+            queries.add(Query.of(q -> q.term(
+                    t -> t.field("rating").value(rating))));
+        }
+
+        if (visible != null) {
+            queries.add(Query.of(q -> q.term(
+                    t -> t.field("visible").value(visible))));
+        }
+
+        NativeQuery query;
+
+        if (queries.isEmpty()) {
+
+            query = NativeQuery.builder()
+                    .withQuery(q -> q.matchAll(m -> m))
+                    .build();
+
+        } else {
+
+            query = NativeQuery.builder()
+                    .withQuery(q -> q.bool(
+                            b -> b.must(queries)))
+                    .build();
+        }
+
+        SearchHits<BookDocument> hits =
+                elasticsearchOperations.search(
+                        query,
+                        BookDocument.class);
+
+        return hits.stream()
+                .map(hit -> hit.getContent())
                 .toList();
     }
 

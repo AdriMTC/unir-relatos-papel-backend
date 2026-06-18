@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@Document(indexName = "books" , createIndex = false)
+@Document(indexName = "books", createIndex = false)
 public class BookDocument {
 
     @Id
