@@ -9,6 +9,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,6 +24,9 @@ public class Order {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
+    @Column(name = "user_email", nullable = false)
+    private String userEmail;
+
     @Column(name = "book_id", nullable = false)
     private Long bookId;
 
@@ -31,6 +35,9 @@ public class Order {
 
     @Column(nullable = false)
     private Integer quantity;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal total;
 
     @Column(nullable = false)
     private String status;

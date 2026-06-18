@@ -1,5 +1,3 @@
-version: '3.8'
-
 # ─────────────────────────────────────────────────────────────────
 #  Relatos de Papel — Infraestructura local completa
 #  Uso: docker-compose up -d
