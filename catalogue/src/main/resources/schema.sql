@@ -1,5 +1,7 @@
 -- Crear base de datos (ejecutar fuera si usas docker env)
 -- CREATE DATABASE catalogue_db;
+-- 🧹 Limpieza absoluta para iniciar desde cero:
+DROP TABLE IF EXISTS book CASCADE;
 
 CREATE TABLE book (
                       id SERIAL PRIMARY KEY,

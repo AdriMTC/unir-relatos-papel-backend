@@ -10,10 +10,16 @@ spring:
     username: ${ORDERS_DB_USER:postgres}
     password: ${ORDERS_DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always # Para que busque los archivos schema.sql y data.sql al arrancar
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
+logging:
+  level:
+    org.springframework.jdbc.datasource.init.ScriptUtils: DEBUG
 
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}

@@ -23,8 +23,11 @@ public class RequestTranslationFilter implements GlobalFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // 1. Obtenemos la ruta de la petición actual
+        String path = exchange.getRequest().getURI().getPath();
 
-        if (!HttpMethod.POST.equals(exchange.getRequest().getMethod())) {
+        // 2. 🚀 VÍA DE ESCAPE: Si NO es un POST o si la ruta es de autenticación, pasa de largo sin tocar el Body
+        if (!HttpMethod.POST.equals(exchange.getRequest().getMethod()) || path.contains("/auth/")) {
             return chain.filter(exchange);
         }
 

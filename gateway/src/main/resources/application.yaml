@@ -27,7 +27,7 @@ spring:
 
       routes:
         - id: catalogue
-          uri: lb://catalogue-service
+          uri: lb://CATALOGUE-SERVICE
           predicates:
             - Path=/api/v1/books/**
           filters:
@@ -37,6 +37,13 @@ spring:
           uri: lb://orders-service
           predicates:
             - Path=/api/v1/orders/**
+          filters:
+            - StripPrefix=0
+
+        - id: ms-users
+          uri: lb://USERS  # <-- Apesta al "spring.application.name: users" de tu archivo
+          predicates:
+            - Path=/api/v1/auth/**
           filters:
             - StripPrefix=0
 

@@ -1,0 +1,15 @@
+# Servidor MySQL 2: Para el Microservicio de Usuarios
+services:
+  db-users:
+    image: mysql:8.0
+    container_name: dwfs-users-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: db_users
+    ports:
+      - "3308:3306" # AQUÍ mapeamos el 3307 para que no choque con el de arriba
+    volumes:
+      - users_vol:/var/lib/mysql # 👈 Busca "users_vol"
+
+volumes:
+  users_vol: # 🚀 CORREGIDO: Ahora se llama igual que arriba

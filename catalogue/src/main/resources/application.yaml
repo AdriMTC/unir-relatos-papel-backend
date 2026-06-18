@@ -11,9 +11,16 @@ spring:
     password: ${CATALOGUE_DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
+  # 🚀 AUTOMATIZACIÓN DE TUS SCRIPTS:
+  sql:
+    init:
+      mode: always
+
   jpa:
+    defer-datasource-initialization: true # 🔴 CRÍTICO: Espera a que termine el esquema antes de meter los datos
     hibernate:
-      ddl-auto: none
+      ddl-auto: none # 👈 CAMBIADO A "none": Ahora tus scripts mandan, así evitamos que Hibernate intente duplicar la tabla
+    
     show-sql: true
     properties:
       hibernate:
@@ -25,4 +32,5 @@ eureka:
       defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
 
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
