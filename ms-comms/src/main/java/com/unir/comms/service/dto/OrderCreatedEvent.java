@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderCreatedEvent {
+    private static final long serialVersionUID = 1L;
+
     private Long orderId;
     private String userId;
     private String userEmail;

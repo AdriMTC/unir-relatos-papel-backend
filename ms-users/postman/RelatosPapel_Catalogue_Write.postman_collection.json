@@ -1,0 +1,578 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "RelatosPapel - Catalogue Write Operations",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleccion para probar las operaciones de escritura del microservicio catalogue a traves del API Gateway.\n\n⚠️  IMPORTANTE - Patron GatewayRequest:\nEl gateway intercepta todos los POST no-auth y espera que el body sea un objeto GatewayRequest con la forma:\n  { \"targetMethod\": \"POST\", \"queryParams\": {}, \"body\": { ...BookDTO... } }\nLas operaciones PUT, PATCH y DELETE no necesitan este wrapper y se envian directamente."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8090"
+    },
+    {
+      "key": "bookTitle",
+      "value": "El Quijote - Postman Test"
+    },
+    {
+      "key": "bookAuthor",
+      "value": "Miguel de Cervantes"
+    },
+    {
+      "key": "bookPublicationDate",
+      "value": "1605-01-16"
+    },
+    {
+      "key": "bookCategory",
+      "value": "Novela"
+    },
+    {
+      "key": "bookRating",
+      "value": "4"
+    },
+    {
+      "key": "bookVisible",
+      "value": "true"
+    },
+    {
+      "key": "bookStock",
+      "value": "10"
+    },
+    {
+      "key": "bookPrice",
+      "value": "19.99"
+    },
+    {
+      "key": "updatedBookTitle",
+      "value": "El Quijote - Actualizado"
+    },
+    {
+      "key": "patchTitle",
+      "value": "El Quijote - Parche"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Auth",
+      "item": [
+        {
+          "name": "Login admin (guardar adminOpaqueToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.expect(json).to.have.property('accessToken');",
+                  "pm.expect(json.accessToken).to.be.a('string');",
+                  "pm.environment.set('adminOpaqueToken', json.accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@unir.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "01 - Crear libro (POST)",
+      "item": [
+        {
+          "name": "POST crear libro - admin (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Generamos un ISBN unico para evitar conflictos por constraint UNIQUE",
+                  "const ts = new Date().getTime().toString().slice(-9);",
+                  "pm.environment.set('bookIsbn', '978-TEST-' + ts);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.expect(json).to.have.property('id');",
+                  "pm.expect(json.title).to.eql(pm.variables.get('bookTitle'));",
+                  "pm.expect(json.author).to.eql(pm.variables.get('bookAuthor'));",
+                  "pm.environment.set('createdBookId', String(json.id));",
+                  "pm.test('ISBN guardado en entorno', function () {",
+                  "  pm.expect(pm.environment.get('createdBookId')).to.not.be.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminOpaqueToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetMethod\": \"POST\",\n  \"queryParams\": {},\n  \"body\": {\n    \"title\": \"{{bookTitle}}\",\n    \"author\": \"{{bookAuthor}}\",\n    \"publicationDate\": \"{{bookPublicationDate}}\",\n    \"category\": \"{{bookCategory}}\",\n    \"isbn\": \"{{bookIsbn}}\",\n    \"rating\": {{bookRating}},\n    \"visible\": {{bookVisible}},\n    \"stock\": {{bookStock}},\n    \"price\": {{bookPrice}}\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST crear libro - sin token (401)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ts = new Date().getTime().toString().slice(-9);",
+                  "pm.environment.set('bookIsbn', '978-TEST-' + ts);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetMethod\": \"POST\",\n  \"queryParams\": {},\n  \"body\": {\n    \"title\": \"{{bookTitle}}\",\n    \"author\": \"{{bookAuthor}}\",\n    \"publicationDate\": \"{{bookPublicationDate}}\",\n    \"category\": \"{{bookCategory}}\",\n    \"isbn\": \"{{bookIsbn}}\",\n    \"rating\": {{bookRating}},\n    \"visible\": {{bookVisible}},\n    \"stock\": {{bookStock}},\n    \"price\": {{bookPrice}}\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST sin targetMethod - gateway rechaza (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400 - gateway rechaza body sin targetMethod', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminOpaqueToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{bookTitle}}\",\n  \"author\": \"{{bookAuthor}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Actualizar libro (PUT)",
+      "item": [
+        {
+          "name": "PUT actualizar libro completo - admin (200)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ts = new Date().getTime().toString().slice(-9);",
+                  "pm.environment.set('bookIsbn', '978-PUT-' + ts);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.expect(json.title).to.eql(pm.variables.get('updatedBookTitle'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminOpaqueToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{updatedBookTitle}}\",\n  \"author\": \"{{bookAuthor}}\",\n  \"publicationDate\": \"{{bookPublicationDate}}\",\n  \"category\": \"{{bookCategory}}\",\n  \"isbn\": \"{{bookIsbn}}\",\n  \"rating\": {{bookRating}},\n  \"visible\": {{bookVisible}},\n  \"stock\": 20,\n  \"price\": {{bookPrice}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{createdBookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "{{createdBookId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT libro inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminOpaqueToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Libro Fantasma\",\n  \"author\": \"Autor Inexistente\",\n  \"isbn\": \"000-000-000\",\n  \"rating\": 1,\n  \"visible\": false,\n  \"stock\": 0,\n  \"price\": 0.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "999999"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Actualizar parcial (PATCH)",
+      "item": [
+        {
+          "name": "PATCH actualizar titulo - admin (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.expect(json.title).to.eql(pm.variables.get('patchTitle'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminOpaqueToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{patchTitle}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{createdBookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "{{createdBookId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH cambiar visibilidad - admin (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.expect(json.visible).to.eql(false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminOpaqueToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visible\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{createdBookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "{{createdBookId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Eliminar libro (DELETE)",
+      "item": [
+        {
+          "name": "DELETE libro creado - admin (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.environment.unset('createdBookId');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminOpaqueToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{createdBookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "{{createdBookId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Cleanup",
+      "item": [
+        {
+          "name": "Logout admin (204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.environment.unset('adminOpaqueToken');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminOpaqueToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
+

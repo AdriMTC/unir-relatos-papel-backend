@@ -7,23 +7,21 @@ spring:
 
   cloud:
     gateway:
+      # 🌟 LA MAGIA: globalcors debe estar a este nivel exacto, fuera de discovery
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
-          default-filters:
-            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-          globals:
-            cors-configurations:
-              '[/**]':
-                allowedOrigins: ${ALLOWED_ORIGINS:*}
-                allowedHeaders: "*"
-                allowedMethods:
-                  - POST
-                  - GET
-                  - PUT
-                  - PATCH
-                  - DELETE
 
       routes:
         - id: catalogue
@@ -41,11 +39,17 @@ spring:
             - StripPrefix=0
 
         - id: ms-users
-          uri: lb://USERS  # <-- Apesta al "spring.application.name: users" de tu archivo
+          uri: lb://USERS
           predicates:
             - Path=/api/v1/auth/**
           filters:
             - StripPrefix=0
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
 
 eureka:
   client:
@@ -66,7 +70,6 @@ management:
     web:
       exposure:
         include: "*"
-
   endpoint:
     gateway:
       access: unrestricted

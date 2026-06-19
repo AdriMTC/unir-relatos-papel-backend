@@ -2,10 +2,11 @@
 
 Archivos incluidos:
 
-- `RelatosPapel_Act3.postman_collection.json`
-- `RelatosPapel_Orders.postman_collection.json`
-- `RelatosPapel_Local.postman_environment.json`
-- `RelatosPapel_Orders_Local.postman_environment.json`
+| Coleccion | Environment recomendado | Proposito |
+|---|---|---|
+| `RelatosPapel_Act3.postman_collection.json` | `RelatosPapel_Local.postman_environment.json` | Flujo completo de auth + catalogue + orders |
+| `RelatosPapel_Orders.postman_collection.json` | `RelatosPapel_Orders_Local.postman_environment.json` | Solo operaciones de orders |
+| `RelatosPapel_Catalogue_Write.postman_collection.json` | `RelatosPapel_Catalogue_Write_Local.postman_environment.json` | Operaciones de escritura del catalogo (POST/PUT/PATCH/DELETE) |
 
 ## Importar en Postman
 
@@ -21,6 +22,29 @@ En la coleccion se agregaron estas variables para registrar un usuario manualmen
 - `newUserPassword`
 - `newUserRole` (`ROLE_LECTOR` o `ROLE_ADMIN`)
 - `newUserEnabled` (`true` o `false`)
+
+## Coleccion "Catalogue Write Operations"
+
+La coleccion `RelatosPapel_Catalogue_Write.postman_collection.json` cubre todas las operaciones de escritura:
+
+1. Login admin
+2. `POST /api/v1/books` — Crear libro (requiere wrapper GatewayRequest)
+3. `PUT /api/v1/books/{id}` — Reemplazar libro completo
+4. `PATCH /api/v1/books/{id}` — Actualizacion parcial (titulo, visibilidad, etc.)
+5. `DELETE /api/v1/books/{id}` — Eliminar libro
+6. Logout admin
+
+> **⚠️ Patron GatewayRequest para POST**:
+> El gateway intercepta todos los `POST` no-auth y espera el body envuelto:
+> ```json
+> { "targetMethod": "POST", "queryParams": {}, "body": { ...BookDTO... } }
+> ```
+> Los metodos `PUT`, `PATCH` y `DELETE` se envian con el body de `BookDTO` directamente.
+
+Variables de entorno relevantes: `bookTitle`, `bookAuthor`, `bookCategory`, `bookRating`, `bookVisible`, `bookStock`, `bookPrice`, `bookPublicationDate`.
+El `bookIsbn` se genera automaticamente en el pre-request script para evitar conflictos por la restriccion `UNIQUE`.
+
+---
 
 ## Coleccion "Orders Only"
 

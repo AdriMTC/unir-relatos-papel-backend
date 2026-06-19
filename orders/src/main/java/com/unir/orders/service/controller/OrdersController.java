@@ -5,12 +5,9 @@ import com.unir.orders.service.dto.OrderResponse;
 import com.unir.orders.service.service.OrdersService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,8 +19,13 @@ public class OrdersController {
     private final OrdersService ordersService;
 
     @PostMapping
-    public OrderResponse create(@Valid @RequestBody CreateOrderRequest request) {
-        return ordersService.create(request);
+    @ResponseStatus(HttpStatus.CREATED) // Retorna automáticamente un estado 201 Created al completarse
+    public OrderResponse create(
+            @Valid @RequestBody CreateOrderRequest request,
+            @RequestHeader("accessToken") String jwt) { // 👈 La cabecera se declara AQUÍ, como parámetro del método
+
+        // Pasamos tanto la petición como el JWT al servicio para procesar la lógica de negocio
+        return ordersService.create(request, jwt);
     }
 
     @GetMapping("/users/{userId}/recent")
@@ -31,4 +33,3 @@ public class OrdersController {
         return ordersService.getRecentOrdersByUser(userId);
     }
 }
-

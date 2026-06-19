@@ -27,7 +27,7 @@ public class OrdersService {
     private final CatalogueClient catalogueClient;
     private final RabbitTemplate rabbitTemplate;
 
-    public OrderResponse create(CreateOrderRequest request) {
+    public OrderResponse create(CreateOrderRequest request, String jwt) {
         CatalogueBookResponse book = catalogueClient.getBookById(request.getBookId());
         validateBook(book);
 

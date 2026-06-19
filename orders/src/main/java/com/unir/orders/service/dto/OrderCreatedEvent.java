@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable; // 👈 ¡Obligatorio para RabbitMQ!
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -13,6 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderCreatedEvent {
+    // Es una buena práctica de Java añadir el serialVersionUID
+    private static final long serialVersionUID = 1L;
+
     private Long orderId;
     private String userId;
     private String userEmail;

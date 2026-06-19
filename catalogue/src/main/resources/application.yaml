@@ -11,6 +11,13 @@ spring:
     password: ${CATALOGUE_DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # 🔑 Apunta directamente al archivo que acabas de pegar
+          public-key-location: classpath:public.pem
+
   # 🚀 AUTOMATIZACIÓN DE TUS SCRIPTS:
   sql:
     init:
@@ -20,7 +27,7 @@ spring:
     defer-datasource-initialization: true # 🔴 CRÍTICO: Espera a que termine el esquema antes de meter los datos
     hibernate:
       ddl-auto: none # 👈 CAMBIADO A "none": Ahora tus scripts mandan, así evitamos que Hibernate intente duplicar la tabla
-    
+
     show-sql: true
     properties:
       hibernate:
