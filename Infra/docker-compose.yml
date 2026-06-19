@@ -100,4 +100,5 @@ volumes:
 
 networks:
   relatos-net:
+    name: relatos-net
     driver: bridge
