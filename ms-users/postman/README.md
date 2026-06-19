@@ -8,6 +8,10 @@ Archivos incluidos:
 | `RelatosPapel_Orders.postman_collection.json` | `RelatosPapel_Orders_Local.postman_environment.json` | Solo operaciones de orders |
 | `RelatosPapel_Catalogue_Write.postman_collection.json` | `RelatosPapel_Catalogue_Write_Local.postman_environment.json` | Operaciones de escritura del catalogo (POST/PUT/PATCH/DELETE) |
 
+Guias:
+
+- `RelatosPapel_Flujo_Token.md` (flujo de uso de token opaco/JWT interno)
+
 ## Importar en Postman
 
 1. Abrir Postman.
