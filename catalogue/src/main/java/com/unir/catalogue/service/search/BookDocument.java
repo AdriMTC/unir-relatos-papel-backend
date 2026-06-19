@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 
 @Data
 @Document(indexName = "books", createIndex = false)
@@ -15,7 +15,7 @@ public class BookDocument {
     private Long id;
     private String title;
     private String author;
-    private LocalDate publicationDate;
+    private Instant publicationDate;
     private String category;
     private String isbn;
     private Integer rating;

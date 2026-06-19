@@ -1,24 +1,18 @@
--- Crear base de datos (ejecutar fuera si usas docker env)
 -- CREATE DATABASE catalogue_db;
 
 CREATE TABLE book (
                       id SERIAL PRIMARY KEY,
-
                       title VARCHAR(255) NOT NULL,
                       author VARCHAR(255) NOT NULL,
                       publication_date DATE,
-
                       category VARCHAR(100),
                       isbn VARCHAR(30) UNIQUE NOT NULL,
-
                       rating INT CHECK (rating BETWEEN 1 AND 5),
-
                       visible BOOLEAN DEFAULT TRUE,
-
                       stock INT DEFAULT 0 CHECK (stock >= 0),
-
                       price NUMERIC(10,2) CHECK (price >= 0),
-
+                      description TEXT,
+                      image VARCHAR(500),
                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

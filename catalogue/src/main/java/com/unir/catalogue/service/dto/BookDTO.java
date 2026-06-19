@@ -17,6 +17,7 @@ public class BookDTO {
     private Boolean visible;
     private Integer stock;
     private BigDecimal price;
+    private String image;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 

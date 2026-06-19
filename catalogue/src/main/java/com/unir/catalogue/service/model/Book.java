@@ -46,4 +46,7 @@ public class Book extends Audit {
     @Column(name="price" ,precision = 10, scale = 2)
     private BigDecimal price;
 
+    @Column(name="image")
+    private String image;
+
 }

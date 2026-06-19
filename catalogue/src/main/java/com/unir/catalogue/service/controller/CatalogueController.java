@@ -5,6 +5,7 @@ import com.unir.catalogue.service.model.Book;
 import com.unir.catalogue.service.search.BookDocument;
 import com.unir.catalogue.service.service.CatalogueService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -36,7 +37,9 @@ public class CatalogueController {
             @RequestParam(required = false) String isbn,
             @RequestParam(required = false) Integer rating,
             @RequestParam(required = false) Boolean visible,
-            @RequestParam(required = false) LocalDate publicationDate
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate publicationDate
     ) {
         return catalogueService.search(
                 title,
