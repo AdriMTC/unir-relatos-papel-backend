@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Data
-@Document(indexName = "books", createIndex = false)
+@Document(indexName = "books")
 public class BookDocument {
 
     @Id
@@ -22,4 +22,6 @@ public class BookDocument {
     private Boolean visible;
     private Integer stock;
     private BigDecimal price;
+    private String description;
+    private String image;
 }

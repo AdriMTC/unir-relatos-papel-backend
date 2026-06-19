@@ -30,6 +30,8 @@ public class BookMapper {
         doc.setVisible(book.getVisible());
         doc.setStock(book.getStock());
         doc.setPrice(book.getPrice());
+        doc.setDescription(book.getDescription());
+        doc.setImage(book.getImage());
 
         return doc;
     }

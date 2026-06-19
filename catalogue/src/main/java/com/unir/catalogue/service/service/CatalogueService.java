@@ -186,5 +186,11 @@ public class CatalogueService {
 
         if (dto.getPrice() != null)
             book.setPrice(dto.getPrice());
+
+        if (dto.getDescription() != null)
+            book.setDescription(dto.getDescription());
+
+        if (dto.getImage() != null)
+            book.setImage(dto.getImage());
     }
 }
