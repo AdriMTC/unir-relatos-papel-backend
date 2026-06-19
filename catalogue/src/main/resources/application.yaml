@@ -6,9 +6,9 @@ spring:
     name: catalogue-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5434/catalogue_db
-    username: postgres
-    password: postgres
+    url: ${CATALOGUE_DB_URL:jdbc:postgresql://localhost:5434/catalogue_db}
+    username: ${CATALOGUE_DB_USER:postgres}
+    password: ${CATALOGUE_DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
   jpa:

@@ -19,11 +19,10 @@ public class CreateOrderRequest {
     @Min(value = 1, message = "La quantity debe ser mayor o igual a 1")
     private Integer quantity;
 
-    @NotBlank(message = "El customerEmail es obligatorio")
-    @Email(message = "El customerEmail debe ser un email válido")
-    private String customerEmail;
+    @NotBlank(message = "El userEmail es obligatorio")
+    @Email(message = "El userEmail debe ser un email válido")
+    private String userEmail;
 
-    @NotBlank(message = "El customerName es obligatorio")
     private String customerName;
 }
 

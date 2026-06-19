@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  catalogue-db:
+    image: postgres:15
+    container_name: catalogue-db
+    restart: always
+    environment:
+      POSTGRES_DB: catalogue_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - catalogue_data:/var/lib/postgresql/data
+
+  orders-db:
+    image: postgres:15
+    container_name: orders-db
+    restart: always
+    environment:
+      POSTGRES_DB: orders_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - orders_data:/var/lib/postgresql/data
+
+  relatos-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: relatos-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+
+  relatos-redis:
+    image: redis:7-alpine
+    container_name: relatos-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+volumes:
+  catalogue_data:
+  orders_data:
