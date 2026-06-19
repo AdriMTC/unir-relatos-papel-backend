@@ -19,20 +19,24 @@ services:
 
   # ── Microservicios de Negocio ────────────────────────────────────
 
-  users-service:
-    build: ./ms-users # 📁 CORREGIDO: Apunta a tu carpeta 'ms-users'
-    container_name: relatos-users
-    restart: always
-    ports:
-      - "8083:8083"
-    depends_on:
-      - eureka-server
-    networks:
-      - relatos-net
-    environment:
-      - EUREKA_URL=http://eureka-server:8761/eureka/
-      - SPRING_REDIS_HOST=relatos-redis
-      - SPRING_DATASOURCE_URL=jdbc:mysql://dwfs-users-db:3306/users_db
+   users-service:
+     build: ./ms-users # 📁 CORREGIDO: Apunta a tu carpeta 'ms-users'
+     container_name: relatos-users
+     restart: always
+     ports:
+       - "8083:8083"
+     depends_on:
+       - eureka-server
+     networks:
+       - relatos-net
+     environment:
+       - EUREKA_URL=http://eureka-server:8761/eureka/
+       - SPRING_REDIS_HOST=relatos-redis
+       - REDIS_PASSWORD=
+       - DB_URL=jdbc:mysql://relatos-users-db:3306/db_users?createDatabaseIfNotExist=true
+       - DB_USER=root
+       - DB_PASSWORD=root_password
+       - DB_DRIVER=com.mysql.cj.jdbc.Driver
 
   catalogue-service:
     build: ./catalogue # 📁 ¡Correcto! Coincide con tu carpeta 'catalogue'
@@ -64,35 +68,41 @@ services:
       - ORDERS_DB_URL=jdbc:postgresql://orders-db:5432/orders_db
       - SPRING_RABBITMQ_HOST=relatos-rabbitmq
 
-  comms-service:
-    build: ./ms-comms # 📁 CORREGIDO: Apunta a tu carpeta 'ms-comms'
-    container_name: relatos-comms
-    restart: always
-    ports:
-      - "8084:8084"
-    depends_on:
-      - eureka-server
-    networks:
-      - relatos-net
-    environment:
-      - EUREKA_URL=http://eureka-server:8761/eureka/
-      - SPRING_RABBITMQ_HOST=relatos-rabbitmq
+   comms-service:
+     build: ./ms-comms # 📁 CORREGIDO: Apunta a tu carpeta 'ms-comms'
+     container_name: relatos-comms
+     restart: always
+     ports:
+       - "8084:8084"
+     depends_on:
+       - eureka-server
+     networks:
+       - relatos-net
+     environment:
+       - EUREKA_URL=http://eureka-server:8761/eureka/
+       - SPRING_RABBITMQ_HOST=relatos-rabbitmq
+       - MAIL_HOST=smtp.gmail.com
+       - MAIL_PORT=587
+       - MAIL_USERNAME=${MAIL_USERNAME}
+       - MAIL_PASSWORD=${MAIL_PASSWORD}
+       - GEMINI_API_KEY=${GEMINI_API_KEY}
 
   # ── Puerta de Enlace Criptográfica (API Gateway) ─────────────────
 
-  api-gateway:
-    build: ./gateway # 📁 CORREGIDO: Apunta a tu carpeta 'gateway'
-    container_name: relatos-gateway
-    restart: always
-    ports:
-      - "8090:8090"
-    depends_on:
-      - eureka-server
-    networks:
-      - relatos-net
-    environment:
-      - EUREKA_URL=http://eureka-server:8761/eureka/
-      - SPRING_REDIS_HOST=relatos-redis
+   api-gateway:
+     build: ./gateway # 📁 CORREGIDO: Apunta a tu carpeta 'gateway'
+     container_name: relatos-gateway
+     restart: always
+     ports:
+       - "8090:8090"
+     depends_on:
+       - eureka-server
+     networks:
+       - relatos-net
+     environment:
+       - EUREKA_URL=http://eureka-server:8761/eureka/
+       - EUREKA_HOST=eureka-server
+       - SPRING_REDIS_HOST=relatos-redis
 
 # ── Vinculación con la Red de Infraestructura Existente ───────────
 

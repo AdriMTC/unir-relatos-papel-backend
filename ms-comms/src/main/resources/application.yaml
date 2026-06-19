@@ -12,16 +12,16 @@ spring:
     username: ${RABBITMQ_USER:guest}
     password: ${RABBITMQ_PASS:guest}
 
-  # SMTP Gmail
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${GMAIL_USERNAME:hguajardoc@gmail.com}
-    password: ${GMAIL_APP_PASSWORD:yxyd jyoc ssbw mlwv}
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
-      mail.smtp.starttls.required: true
+   # SMTP Gmail
+   mail:
+     host: ${MAIL_HOST:smtp.gmail.com}
+     port: ${MAIL_PORT:587}
+     username: ${MAIL_USERNAME:}
+     password: ${MAIL_PASSWORD:}
+     properties:
+       mail.smtp.auth: true
+       mail.smtp.starttls.enable: true
+       mail.smtp.starttls.required: true
 
 # Eureka
 eureka:

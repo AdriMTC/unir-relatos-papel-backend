@@ -6,16 +6,16 @@ spring:
   application:
     name: orders-service
 
-  datasource:
-    url: ${ORDERS_DB_URL:jdbc:postgresql://localhost:5435/orders_db}
-    username: ${ORDERS_DB_USER:postgres}
-    password: ${ORDERS_DB_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
+   datasource:
+     url: ${ORDERS_DB_URL:jdbc:postgresql://localhost:5432/orders_db}
+     username: ${ORDERS_DB_USER:postgres}
+     password: ${ORDERS_DB_PASSWORD:postgres}
+     driver-class-name: org.postgresql.Driver
 
   sql:
     init:
       mode: always # Para que busque los archivos schema.sql y data.sql al arrancar
-      
+
   jpa:
     hibernate:
       ddl-auto: update
