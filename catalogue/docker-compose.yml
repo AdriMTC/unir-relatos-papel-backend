@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgres-catalogue:
+    image: postgres:15
+    container_name: catalogue-db
+    restart: always
+    environment:
+      POSTGRES_DB: catalogue_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - catalogue_data:/var/lib/postgresql/data
+
+  elasticsearch:
+    image: elasticsearch:9.2.8
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+
+volumes:
+  catalogue_data:

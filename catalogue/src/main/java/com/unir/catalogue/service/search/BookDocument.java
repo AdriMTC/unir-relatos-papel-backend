@@ -1,17 +1,21 @@
-package com.unir.catalogue.service.dto;
+package com.unir.catalogue.service.search;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.time.Instant;
 
 @Data
-public class BookDTO {
+@Document(indexName = "books")
+public class BookDocument {
 
+    @Id
+    private Long id;
     private String title;
     private String author;
-    private LocalDate publicationDate;
+    private Instant publicationDate;
     private String category;
     private String isbn;
     private Integer rating;
